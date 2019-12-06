@@ -1,2 +1,2 @@
-starting task: 97
+starting task: 73
 goal task: 36
