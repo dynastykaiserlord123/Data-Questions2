@@ -16,26 +16,43 @@ public class Dependencies {
 	// Thus if task 102 depends on tasks 97, 94, and 56, we will hash the key as 102
 	// and a list of values of 97, 94, and 56
 	private HashMap<Integer, ArrayList<Integer>> dependencies = new HashMap<Integer, ArrayList<Integer>>();
-	
+
 	private Integer goal;
 	private Integer start;
-	
+
 	// Since the order of the dependencies matter, we will use a linked hash set to
 	// maintain order
 	private Set<String> sequence = new LinkedHashSet<String>();
 	private Set<String> startDependencies = new HashSet<String>();
-	
-	// Keeps track of all valid task ids. Thus if the user inputs an id that doesn't exist,
+
+	// Keeps track of all valid task ids. Thus if the user inputs an id that doesn't
+	// exist,
 	// the program will let the user know that the task id they input was invalid
 	private Set<String> tasks;
 
+	private String relationsPath;
+	private String taskIDPath;
+	private String questionsPath;
+
 	/**
-	 * Default constructor for the class. Both the start and end tasks MUST be
-	 * within the list of task ids
+	 * Parameterized constructor for the class. Allows the user to dynamically
+	 * specify the paths of the 3 files
+	 * 
+	 * @param relation
+	 *            The path of the file containing the mappings of the pipeline
+	 *            dependencies
+	 * @param id
+	 *            The path of the file containing all the ids of valid tasks
+	 * @param question
+	 *            The path of the file containing the start and goal tasks
 	 */
-	public Dependencies() {
+	public Dependencies(String relation, String id, String question) {
+		setRelationsPath(relation);
+		setTaskIDPath(id);
+		setQuestionsPath(question);
 		initialize();
 	}
+
 
 	/**
 	 * This initialization method will read all of the dependencies from an input
@@ -48,7 +65,7 @@ public class Dependencies {
 		try {
 			Integer key;
 			Integer value;
-			br = new BufferedReader(new FileReader("relations.txt"));
+			br = new BufferedReader(new FileReader(relationsPath));
 			String dependency = br.readLine();
 			while (dependency != null && dependency.length() > 0) {
 				key = Integer.parseInt(dependency.split("->")[1]);
@@ -65,10 +82,10 @@ public class Dependencies {
 				dependency = br.readLine();
 			}
 			br.close();
-			br = new BufferedReader(new FileReader("task_ids.txt"));
+			br = new BufferedReader(new FileReader(taskIDPath));
 			tasks = new HashSet<String>(Arrays.asList(br.readLine().split(",")));
 			br.close();
-			br = new BufferedReader(new FileReader("question.txt"));
+			br = new BufferedReader(new FileReader(questionsPath));
 			Integer inputStart = Integer.parseInt(br.readLine().split(":")[1].trim());
 			Integer inputGoal = Integer.parseInt(br.readLine().split(":")[1].trim());
 			if (tasks.contains(inputGoal.toString()) && tasks.contains(inputStart.toString())) {
@@ -77,7 +94,9 @@ public class Dependencies {
 			}
 			br.close();
 		} catch (FileNotFoundException e) {
+			System.out.println("One or more of the input file paths could not be found. Exiting...");
 			e.printStackTrace();
+			System.exit(0);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -121,9 +140,9 @@ public class Dependencies {
 	 * with the goal while excluding all prerequisites of the start task. As the
 	 * order of the tasks is very important, this method will start by adding from
 	 * the lowest tier tasks which have the fewest prerequisites and end with the
-	 * goal task. However if the goal task is actually a prerequisite of the start task,
-	 * this method will return an empty set as the goal task would be assumed to already 
-	 * have been completed prior to the start task anyway
+	 * goal task. However if the goal task is actually a prerequisite of the start
+	 * task, this method will return an empty set as the goal task would be assumed
+	 * to already have been completed prior to the start task anyway
 	 * 
 	 * @param goal
 	 *            The end goal task whose dependencies we want to print out
@@ -163,5 +182,29 @@ public class Dependencies {
 
 	public void setStart(int start) {
 		this.start = start;
+	}
+
+	public String getRelationsPath() {
+		return relationsPath;
+	}
+
+	public void setRelationsPath(String relationsPath) {
+		this.relationsPath = relationsPath;
+	}
+
+	public String getTaskIDPath() {
+		return taskIDPath;
+	}
+
+	public void setTaskIDPath(String taskIDPath) {
+		this.taskIDPath = taskIDPath;
+	}
+
+	public String getQuestionsPath() {
+		return questionsPath;
+	}
+
+	public void setQuestionsPath(String questionsPath) {
+		this.questionsPath = questionsPath;
 	}
 }
